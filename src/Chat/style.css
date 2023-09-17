@@ -81,12 +81,12 @@ body {
     justify-content: flex-end;
   }
   .own-message .chat-content {
-    background-color: #cec1ac;  /* Background color for our own messages */
+    background-color: #a87c35;  /* Background color for our own messages */
     border-radius: 10px;
     padding: 8px;
   }
   .chat-message .chat-content {
-    background-color: #9dc3d4;  /* Background color for other users */
+    background-color: #b8ebff;  /* Background color for other users */
     border-radius: 10px;
     padding: 8px;
   }
