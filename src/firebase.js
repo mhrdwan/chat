@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken } from "firebase/messaging";
 import { getFirestore } from "firebase/firestore"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "./Login";
 
 
@@ -21,7 +21,9 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 const messaging = getMessaging(app);
-export const db = getFirestore(app)
+export const db = getFirestore(app);
+
+
 // Add the public key generated from the console here.
 export const requestMessagingPermission = async () => {
   try {

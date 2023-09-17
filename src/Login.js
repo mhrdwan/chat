@@ -3,9 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { Button, Col, Input, notification } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import { requestMessagingPermission } from './firebase';
+import HalamanChat from './Chat/HalamanChat';
+import useUserStore from './zustand/UserStore';
 
-function Login({token}) {
-
+function Login({ token }) {
+    const setUsername = useUserStore((state) => state.setUsername);
+    const [username, setusername] = useState("")
     useEffect(() => {
         requestMessagingPermission()
     }, [])
@@ -43,9 +46,10 @@ function Login({token}) {
         );
 
         if (matchedUser) {
+            setUsername(matchedUser.username); 
             notification.success({
                 message: "Login Success"
-            })
+            });
             navigate('/chat');
         } else {
             notification.error({
@@ -55,32 +59,36 @@ function Login({token}) {
     };
 
 
-  
+
     return (
-        <div className="App">
-            <Col>
-                <div>
-                    <Input
-                        type='text'
-                        placeholder='Masukkan Username'
-                        onChange={(e) => handleInputChange("username", e.target.value)}
-                    />
+        <>
+            <div className="App">
+
+                <Col>
+                    <div>
+                        <Input
+                            type='text'
+                            placeholder='Masukkan Username'
+                            onChange={(e) => handleInputChange("username", e.target.value)}
+                        />
+                    </div>
+                </Col>
+                <Col>
+                    <div>
+                        <Input
+                            type='password'
+                            style={{ marginTop: 20 }}
+                            placeholder='Masukkan Password'
+                            onChange={(e) => handleInputChange("password", e.target.value)}
+                        />
+                    </div>
+                </Col>
+                <div style={{ marginTop: 15 }}>
+                    <Button onClick={login}>Login</Button>
                 </div>
-            </Col>
-            <Col>
-                <div>
-                    <Input
-                        type='password'
-                        style={{ marginTop: 20 }}
-                        placeholder='Masukkan Password'
-                        onChange={(e) => handleInputChange("password", e.target.value)}
-                    />
-                </div>
-            </Col>
-            <div style={{ marginTop: 15 }}>
-                <Button onClick={login}>Login</Button>
             </div>
-        </div>
+        </>
+
     )
 }
 
