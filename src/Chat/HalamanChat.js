@@ -40,7 +40,7 @@ function HalamanChat({ }) {
     }
     setMessage('');
   };
-if (username === "") {
+if (username === null) {
   return   navigate('/login');
 }
   return (

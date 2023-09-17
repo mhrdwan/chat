@@ -28,6 +28,11 @@ function Login({ token }) {
             username: "iman",
             password: "iman123",
         },
+        {
+            id: 2,
+            username: "ana",
+            password: "ana",
+        },
     ]
 
     const handleInputChange = (key, value) => {
