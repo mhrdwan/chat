@@ -3,10 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken } from "firebase/messaging";
 import { getFirestore } from "firebase/firestore"
-import { useEffect, useState } from "react";
-import Login from "./Login";
-
-
+import { getDatabase } from "firebase/database"
 const firebaseConfig = {
   apiKey: "AIzaSyCTMyawgEETMDIDeyXLHJvNigxCUrzLkek",
   authDomain: "test-b2d2a.firebaseapp.com",
@@ -22,7 +19,7 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 const messaging = getMessaging(app);
 export const db = getFirestore(app);
-
+export const database = getDatabase(app)
 
 // Add the public key generated from the console here.
 export const requestMessagingPermission = async () => {
@@ -31,18 +28,17 @@ export const requestMessagingPermission = async () => {
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       getToken(messaging, { vapidKey: "BNv7qfDGPqIdETB0kL8dO5wZBy-kijuqFyZtLrBcR05bqSLWT8y_7nb1XmiS0ZsrKITa2N8_ekYKS5o3l4gAEFU", })
-      .then((curren) => {
-        if (curren) {
-          console.log(`asuu`, curren);
-        } else {
-          console.log('gagal');
-        }
-      })
+        .then((curren) => {
+          if (curren) {
+            console.log(`asuu`, curren);
+          } else {
+            console.log('gagal');
+          }
+        })
     } else {
       console.log('User did not grant permission');
     }
   } catch (error) {
     console.error("Permission or token error:", error);
   }
-
 };

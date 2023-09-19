@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import './App.css';
 import HalamanChat from './Chat/HalamanChat';
 import Login from './Login';
 import { BrowserRouter as Router , Routes ,Route } from 'react-router-dom';
-import { requestMessagingPermission } from './firebase';
+import Dashboard from './Dashboard';
+import DNDtest from './Dashboard/TestDND';
 function App() {
  
   return (
@@ -11,7 +11,9 @@ function App() {
     <Router>
       <Routes>
         <Route path='/login' element={<Login/>} />
+        <Route path='/dashboard' element={<Dashboard/>} />
         <Route path='/chat' element={<HalamanChat/>} />
+        <Route path='/dnd' element={<DNDtest/>} />
         <Route path='*' element={<Login/>}/>
       </Routes>
     </Router>

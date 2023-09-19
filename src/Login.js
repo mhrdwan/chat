@@ -3,12 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { Button, Col, Input, notification } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import { requestMessagingPermission } from './firebase';
-import HalamanChat from './Chat/HalamanChat';
 import useUserStore from './zustand/UserStore';
 
 function Login({ token }) {
     const setUsername = useUserStore((state) => state.setUsername);
-    const [username, setusername] = useState("")
+    const setidUser = useUserStore((state) => state.setidUser);
     useEffect(() => {
         requestMessagingPermission()
     }, [])
@@ -25,13 +24,18 @@ function Login({ token }) {
         },
         {
             id: 2,
-            username: "iman",
-            password: "iman123",
+            username: "aris",
+            password: "aris123",
         },
         {
-            id: 2,
-            username: "ana",
-            password: "ana",
+            id: 3,
+            username: "dewi",
+            password: "dewi123",
+        },
+        {
+            id: 4,
+            username: "kiran",
+            password: "kiran",
         },
     ]
 
@@ -51,11 +55,12 @@ function Login({ token }) {
         );
 
         if (matchedUser) {
-            setUsername(matchedUser.username); 
+            setUsername(matchedUser.username);
+            setidUser(matchedUser.id);
             notification.success({
                 message: "Login Success"
             });
-            navigate('/chat');
+            navigate('/dashboard');
         } else {
             notification.error({
                 message: "Login Gagal"

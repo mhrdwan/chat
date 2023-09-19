@@ -1,0 +1,13 @@
+.informasi-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .informasi-box {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+  
+  
