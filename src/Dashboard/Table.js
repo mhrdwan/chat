@@ -1,51 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Table, Tag, message } from 'antd';
-import { getDatabase, ref, onValue, off, get, update } from 'firebase/database';
+import { getDatabase, ref, onValue, off, get, update, query, orderByChild } from 'firebase/database';
 import useUserStore from '../zustand/UserStore';
-import { Row } from 'react-bootstrap';
 
 function Tables() {
     const [Datasemua, setDatasemua] = useState([]);
-    const setNamaPengambilBensin = useUserStore((state) => state.setNamaPengambilBensin);
-    const setjamPengambilBensin = useUserStore((state) => state.setjamPengambilBensin);
     const username = useUserStore((state) => state.username);
-
+    const setTerbaruAmbil = useUserStore((state) => state.setTerbaruAmbil);
     useEffect(() => {
         const db = getDatabase();
-        const dropBensinRef = ref(db, 'untukdiambil/diambilorang'); // Update lokasi ref sesuai dengan struktur data
-        const listener = onValue(dropBensinRef, (snapshot) => {
+        const UserStock = ref(db, 'UserAmbilBensin/');
+        const sortedQuery = query(UserStock, orderByChild('TanggalBerapa'));
+
+        const unsubscribe = onValue(sortedQuery, (snapshot) => {
             if (snapshot.exists()) {
-                const allData = snapshot.val();
-                const flattenedData = Object.keys(allData).map((key) => {
-                    return {
-                        ...allData[key],
-                        key, // Firebase key sebagai unique key untuk setiap row
-                    };
-                });
-                // setDatasemua(allData)
-                // Lakukan sorting
-                const sortedData = flattenedData.sort((a, b) => {
-                    const dateA = a.TanggalBerapa.split('-').reverse().join('-'); // Mengubah dari format dd-mm-yyyy menjadi yyyy-mm-dd
-                    const dateB = b.TanggalBerapa.split('-').reverse().join('-'); // Sama seperti di atas
-                    const timeA = a.Jamberapa;
-                    const timeB = b.Jamberapa;
+                const rawData = snapshot.val();
+                const dataArray = Object.keys(rawData).map((key) => ({
+                    id: key,
+                    ...rawData[key],
+                }));
 
-                    return `${dateB} ${timeB}`.localeCompare(`${dateA} ${timeA}`); // Sort secara descending
-                });
+                // Karena Firebase mengurutkan dari kecil ke besar,
+                // kita perlu membalik array untuk mendapatkan urutan dari besar ke kecil (terbaru ke terlama)
+                dataArray.reverse();
 
-                setDatasemua(sortedData);
-                setNamaPengambilBensin(sortedData[0]?.username)
-                setjamPengambilBensin(sortedData[0]?.Jamberapa);
+                console.log(dataArray);  // Menampilkan semua data
+                console.log("Data paling terbaru:", dataArray[0]);  // Menampilkan data paling terbaru
+                setTerbaruAmbil(dataArray[0])
+                setDatasemua(dataArray);
             } else {
-                console.log('No data available');
+                console.log("No data available");
             }
         }, (error) => {
-            console.error(error);
+            console.error("Error fetching data:", error);
         });
 
-        return () => off(dropBensinRef, listener);
-    }, []);
 
+        return () => off(UserStock, unsubscribe);
+    }, []);
 
 
     const columns = [

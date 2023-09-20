@@ -1,52 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { getDatabase, ref, onValue, off, push } from 'firebase/database';
+import { getDatabase, ref, onValue, off, push, orderByKey, query, limitToLast } from 'firebase/database';
 import "./Informasi.css"
 import { Alert, Tag } from 'antd';
 import useUserStore from '../zustand/UserStore';
 function App() {
     const [latestData, setLatestData] = useState([]);
+    const [Display, setDisplay] = useState("");
     const [TerakhirAmbil, setTerakhirAmbil] = useState({
         nama: null,
         BerapaLiter: null,
         Jamberapa: null,
         TanggalBerapa: null,
     });
+    const setDisplayzutand = useUserStore((state) => state.setDisplayzutand);
     const NamaPengambilBensin = useUserStore((state) => state.NamaPengambilBensin);
     const jamPengambilBensin = useUserStore((state) => state.jamPengambilBensin);
+    const TerbaruAmbil = useUserStore((state) => state.TerbaruAmbil);
+    console.log(`TerbaruAmbil`,TerbaruAmbil);
+    const setHitungBerapaLiter = useUserStore((state) => state.setHitungBerapaLiter);
     useEffect(() => {
         const db = getDatabase();
-        const SemuaStock = ref(db, 'Stock');
-        const connectedRef = ref(db, ".info/connected");
-        onValue(connectedRef, (snap) => {
-            if (snap.val() === true) {
-            } else {
-                alert("Tidak Ada Koneksi Internet");
-            }
-        });
-        const listener = onValue(SemuaStock, (snapshot) => {
+        const SemuaStock = ref(db, 'MasterUserStock');
+        const MasterDisplayStock = ref(db, 'MasterDisplayStock');
+        const latestDataQuersy = query(MasterDisplayStock, orderByKey(), limitToLast(1));
+        const listeners = onValue(latestDataQuersy, (snapshot) => {
             if (snapshot.exists()) {
                 const allData = snapshot.val();
-                // console.log(`allData`, allData);
-
-                let newLatestData = [];
-
-                for (const userIdx in allData) {
-                    if (allData[userIdx] !== null) {
-                        const keys = Object.keys(allData[userIdx]).sort();
-                        const lastKey = keys[keys.length - 1];
-
-                        // console.log(`Latest data for user index ${userIdx}:`);
-                        const latest = allData[userIdx][lastKey];
-                        // console.log(latest);
-
-                        newLatestData.push(latest);
-                    }
-                }
-
-                setLatestData(newLatestData);
+                // Jika Anda hanya memerlukan 1 data terbaru
+                const latestDatas = Object.values(allData)[0];
+                console.log(`display`, allData.BerapaLiter);
+                setDisplayzutand(allData.BerapaLiter)
+                setDisplay(allData.BerapaLiter)
+                // console.log('Latest Data:', latestDatas);
+            } else {
+                console.log("No data available");
             }
-        }, (error) => {
-            console.error(error);
+        });
+
+        const latestDataQuery = query(SemuaStock, orderByKey(), limitToLast(1));
+        const listener = onValue(latestDataQuery, (snapshot) => {
+            if (snapshot.exists()) {
+                const allData = snapshot.val();
+                // Jika Anda hanya memerlukan 1 data terbaru
+                const latestDatas = Object.values(allData)[0];
+
+                // console.log('Latest Data:', latestDatas);
+                setTerakhirAmbil(latestDatas)
+                setHitungBerapaLiter(latestDatas.BerapaLiter)
+            } else {
+                console.log("No data available");
+            }
         });
 
         return () => off(SemuaStock, listener);
@@ -61,34 +64,34 @@ function App() {
                 Jamberapa: lastEntry.Jamberapa,
                 TanggalBerapa: lastEntry.TanggalBerapa,
             });
+
         }
     }, [latestData]);
 
-    console.log(`TerakhirAmbil`, TerakhirAmbil);
-
-
     return (
         <div className='d-flex justify-content-center'>
-            {TerakhirAmbil.nama && (
+            {TerakhirAmbil && (
                 <div className="informasi-container">
                     <div className="informasi-box">
                         <h5>Jumlah Liter Tersisa</h5>
                         <div className='mt-auto'>
-                            <Tag color='red'>{TerakhirAmbil.BerapaLiter === "0L" ? "Stock Habis" : TerakhirAmbil.BerapaLiter}</Tag>
+                            {/* <Tag color='red'>{TerakhirAmbil.BerapaLiter === "0L" ? "Stock Habis" : TerakhirAmbil.BerapaLiter}</Tag> */}
+                            <Tag color='red'>{Display === "0L" ? "Stock Habis" : Display}</Tag>
                         </div>
                     </div>
                     <div className="informasi-box">
                         <h5>Terakhir Di isi Stock</h5>
                         <div className='mt-auto'>
-                            <Tag color='green'>{TerakhirAmbil.nama}</Tag>
+                            <Tag color='green'>{TerakhirAmbil.username}</Tag>
                             <Tag className='mt-2' color='orange'>{TerakhirAmbil.TanggalBerapa} <br /> {TerakhirAmbil.Jamberapa}</Tag>
                         </div>
                     </div>
                     <div className="informasi-box">
                         <h5>Terakhir Diambil Oleh</h5>
                         <div className='mt-auto'>
-                            <Tag color='blue'>{NamaPengambilBensin}</Tag>
-                            <Tag className='mt-2' color='red'>{jamPengambilBensin}</Tag>
+                            <Tag color='blue'>{TerbaruAmbil?.username}</Tag>
+                            <Tag className='mt-2' color='red'>{TerbaruAmbil?.BerapaLiter}</Tag>
+                            <Tag className='mt-2' color='red'>{TerbaruAmbil?.Jamberapa}</Tag>
                         </div>
                     </div>
                 </div>

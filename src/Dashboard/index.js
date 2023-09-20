@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ref, set, getDatabase, push, onValue, off, update, get } from 'firebase/database';
+import { ref, set, getDatabase, push, onValue, off, update, get, orderByKey, limitToLast, query } from 'firebase/database';
 import NavbarComponent from '../Component/Navbar';
 import { Alert, Button, DatePicker, Input, TimePicker, notification } from 'antd';
 import { Col, Container, Row } from 'react-bootstrap';
@@ -15,7 +15,6 @@ function Dashboard() {
   const navigate = useNavigate()
   const [hide, sethide] = useState(false)
   const [hide1, sethide1] = useState(false)
-  const setidUser = useUserStore((state) => state.idUser);
   const username = useUserStore((state) => state.username);
   const [Inputan, setInputan] = useState({
     BerapaLiter: "",
@@ -56,27 +55,41 @@ function Dashboard() {
           message: "Liter Harus Diisi"
         })
       } else {
-        const userRef = ref(database, 'DropBensin/' + setidUser);
-        const stock = ref(database, 'Stock/' + "semuastock");
-        const stockharian = ref(database, 'StockharianAyah/' + "Stockharianayah");
-        push(userRef, {
+        const MasterStock = ref(database, 'MasterStock/');
+        const UserStock = ref(database, 'MasterUserStock/');
+        const MasterDisplayStock = ref(database, 'MasterDisplayStock/');
+        const stockharian = ref(database, 'StockharianAyah/Stockharianayah');
+        const latestDataQuery = query(stockharian, orderByKey(), limitToLast(1));
+        get(latestDataQuery)
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              const allData = snapshot.val();
+              const latestData = Object.values(allData)[0];
+              const berapaLiter = latestData.BerapaLiter;
+              console.log('BerapaLiter:', berapaLiter);
+            } else {
+              console.log("No data available");
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting data:", error);
+          });
+        push(MasterStock, {
           username: username,
           BerapaLiter: Inputan.BerapaLiter + "L",
           Jamberapa: Inputan.Jamberapa,
           TanggalBerapa: Inputan.TanggalBerapa
         });
-        push(stock, {
+        push(UserStock, {
           username: username,
           BerapaLiter: Inputan.BerapaLiter + "L",
           Jamberapa: Inputan.Jamberapa,
           TanggalBerapa: Inputan.TanggalBerapa
         });
-        push(stockharian, {
-          username: username,
+        set(MasterDisplayStock, {
           BerapaLiter: Inputan.BerapaLiter + "L",
-          Jamberapa: Inputan.Jamberapa,
-          TanggalBerapa: Inputan.TanggalBerapa
         });
+
         notification.success({
           message: "Data Berhasil Di Simpan"
         })
@@ -91,76 +104,62 @@ function Dashboard() {
     }
   }
 
+
+  const [displaynumberliter, setdisplaynumberliter] = useState("")
   useEffect(() => {
     if (!username) {
-      <Alert message="Silahkan Login Kembali" type="error" showIcon />
       navigate('/login');
     }
-  }, [])
+    const MasterDisplayUserStock = ref(database, 'MasterDisplayStock/');
+
+    const handleDataChange = (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const berapaLiter = data.BerapaLiter;
+        setdisplaynumberliter(berapaLiter);
+        console.log("BerapaLiter:", berapaLiter);
+      } else {
+        console.log("No data available");
+      }
+    };
+    const unsubscribe = onValue(MasterDisplayUserStock, handleDataChange);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+
+  console.log(`sadasd`, displaynumberliter);
 
 
 
 
 
 
-
-
-  // Function untuk update jumlah liter
+  // Function untuk update jumlah liter input ke database
   function updateliterdanambil() {
     const db = getDatabase();
-    const SemuaStock = ref(db, 'Stock');
-    get(SemuaStock).then((snapshot) => {
-      if (snapshot.exists()) {
-        const allData = snapshot.val();
-        for (const userIdx in allData) {
-          if (allData[userIdx] !== null) {
-            const keys = Object.keys(allData[userIdx]).sort();
-            const lastKey = keys[keys.length - 1];
-            const latest = allData[userIdx][lastKey];
-            if (latest?.BerapaLiter && InputanAmbilBensin.BerapaLiter) {
-              const updatedBerapaLiter = parseInt(latest.BerapaLiter, 10) - parseInt(InputanAmbilBensin.BerapaLiter, 10);
-              const updatePath = `Stock/${userIdx}/${lastKey}`;
-              update(ref(db, updatePath), {
-                BerapaLiter: updatedBerapaLiter + 'L',
-                Jamberapa: InputanAmbilBensin?.Jamberapa,
-                TanggalBerapa: InputanAmbilBensin?.TanggalBerapa,
-                username: username,
-                Setor: ""
-              })
-              const stockharian = ref(database, 'untukdiambil/' + "diambilorang");
-              push(stockharian, {
-                BerapaLiter: updatedBerapaLiter + 'L',
-                username: username,
-                BerapaLiter: InputanAmbilBensin.BerapaLiter + "L",
-                Jamberapa: InputanAmbilBensin.Jamberapa,
-                TanggalBerapa: InputanAmbilBensin.TanggalBerapa,
-                Setor: ""
-              })
-                .then(() => {
-                  notification.success({
-                    message: "Data Berhasil Di Simpan"
-                  })
-                })
-                .catch((error) => {
-                  console.error("Data could not be updated", error);
-                  notification.error({
-                    message: "Data Tidak Berhasil Di Simpan"
-                  })
-                });
-            }
-          }
-        }
-      }
-    }).catch((error) => {
-      console.error("Data could not be fetched", error);
+    const userambilbensin = ref(database, 'UserAmbilBensin/');
+    push(userambilbensin, {
+      username: username,
+      BerapaLiter: InputanAmbilBensin.BerapaLiter + "L",
+      Jamberapa: InputanAmbilBensin.Jamberapa,
+      TanggalBerapa: InputanAmbilBensin.TanggalBerapa,
+      Status: ""
     });
+    const MasterDisplayUserStock = ref(database, 'MasterDisplayStock/');
+    const updatedBerapaLiter = parseInt(displaynumberliter) - parseInt(InputanAmbilBensin.BerapaLiter);
+    update(MasterDisplayUserStock, {
+      BerapaLiter: updatedBerapaLiter,
+    });
+
   }
 
 
   return (
     <div>
       <NavbarComponent />
-
       <Container>
         <Alert message={`Selamat Datang ${username}`} type="info" />
         {(username === "ridwan" || username === "aris" || username === "dewi") && (
