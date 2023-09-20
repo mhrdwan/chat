@@ -90,7 +90,7 @@ function App() {
                         <h5>Terakhir Diambil Oleh</h5>
                         <div className='mt-auto'>
                             <Tag color='blue'>{TerbaruAmbil?.username}</Tag>
-                            <Tag className='mt-2' color='red'>{TerbaruAmbil?.BerapaLiter}</Tag>
+                            <Tag className='mt-2' color='orange'>{TerbaruAmbil?.BerapaLiter}</Tag>
                             <Tag className='mt-2' color='red'>{TerbaruAmbil?.Jamberapa}</Tag>
                         </div>
                     </div>

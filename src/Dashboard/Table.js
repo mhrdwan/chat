@@ -24,8 +24,8 @@ function Tables() {
                 // kita perlu membalik array untuk mendapatkan urutan dari besar ke kecil (terbaru ke terlama)
                 dataArray.reverse();
 
-                console.log(dataArray);  // Menampilkan semua data
-                console.log("Data paling terbaru:", dataArray[0]);  // Menampilkan data paling terbaru
+                // console.log(dataArray);  // Menampilkan semua data
+                // console.log("Data paling terbaru:", dataArray[0]);  // Menampilkan data paling terbaru
                 setTerbaruAmbil(dataArray[0])
                 setDatasemua(dataArray);
             } else {
@@ -39,6 +39,10 @@ function Tables() {
         return () => off(UserStock, unsubscribe);
     }, []);
 
+    const formatRupiah = (angka) => {
+        const rupiah = angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return `${rupiah}`;
+    }
 
     const columns = [
         {
@@ -58,6 +62,16 @@ function Tables() {
             render: (render) => {
                 return (
                     <Tag color='blue'>{render}</Tag>
+                )
+            }
+        },
+        {
+            title: 'Perkiraan Pendapatan',
+            dataIndex: 'BerapaLiter',
+            key: 'BerapaLiter',
+            render: (render) => {
+                return (
+                    <Tag color='green'>Rp.{formatRupiah(parseInt(render) * 2500)}</Tag>
                 )
             }
         },
