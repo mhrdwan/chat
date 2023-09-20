@@ -194,13 +194,17 @@ function Dashboard() {
         <div className='mt-4'>
           <Harga />
         </div>
-        <div className='mt-4'>
-          <Informasi />
-        </div>
+        <Row>
+          <Col>
+            <div className='mt-4'>
+              <Informasi />
+            </div>
+          </Col>
+        </Row>
 
         <div >
           <Row>
-          <h4 className='mt-4 d-flex justify-content-center'>Menu Update Stock</h4>
+            <h4 className='mt-4 d-flex justify-content-center'>Menu Update Stock</h4>
             <Col className='mt-1 d-flex justify-content-center'>
               {hide === true ? (
                 <div className='d-flex justify-content-center'>

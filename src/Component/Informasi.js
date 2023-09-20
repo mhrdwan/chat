@@ -59,30 +59,34 @@ function App() {
     }, [latestData]);
 
     console.log(`TerakhirAmbil`, TerakhirAmbil);
-    
+
 
     return (
-        <div>
+        <div className='d-flex justify-content-center'>
             {TerakhirAmbil.nama && (
                 <div className="informasi-container">
                     <div className="informasi-box">
                         <h5>Jumlah Liter Tersisa</h5>
-                        <Tag color='red'>{TerakhirAmbil.BerapaLiter === "0L" ? "Stock Habis" : TerakhirAmbil.BerapaLiter}</Tag>
-
+                        <div className='mt-auto'> 
+                            <Tag color='red'>{TerakhirAmbil.BerapaLiter === "0L" ? "Stock Habis" : TerakhirAmbil.BerapaLiter}</Tag>
+                        </div>
                     </div>
                     <div className="informasi-box">
                         <h5>Terakhir Di isi Stock</h5>
-                        <Tag color='green'>{TerakhirAmbil.nama}</Tag>
-                        <Tag className='mt-2' color='orange'>{TerakhirAmbil.TanggalBerapa} <br /> {TerakhirAmbil.Jamberapa}</Tag>
+                        <div className='mt-auto'>
+                            <Tag color='green'>{TerakhirAmbil.nama}</Tag>
+                            <Tag className='mt-2' color='orange'>{TerakhirAmbil.TanggalBerapa} <br /> {TerakhirAmbil.Jamberapa}</Tag>
+                        </div>
                     </div>
                     <div className="informasi-box">
                         <h5>Terakhir Diambil Oleh</h5>
-                        <Tag color='blue'>{NamaPengambilBensin}</Tag>
-                        <Tag className='mt-2' color='red'>{jamPengambilBensin}</Tag>
+                        <div className='mt-auto'>
+                            <Tag color='blue'>{NamaPengambilBensin}</Tag>
+                            <Tag className='mt-2' color='red'>{jamPengambilBensin}</Tag>
+                        </div>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

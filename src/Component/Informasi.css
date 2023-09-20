@@ -8,6 +8,10 @@
     padding: 20px;
     border: 1px solid #ccc;
     text-align: center;
+    display: flex;
+    flex-direction: column;
   }
   
-  
+.mt-auto {
+    margin-top: auto;
+}
