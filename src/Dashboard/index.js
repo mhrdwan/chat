@@ -14,6 +14,7 @@ import Harga from './Harga';
 function Dashboard() {
   const navigate = useNavigate()
   const [hide, sethide] = useState(false)
+  const [hide1, sethide1] = useState(false)
   const setidUser = useUserStore((state) => state.idUser);
   const username = useUserStore((state) => state.username);
   const [Inputan, setInputan] = useState({
@@ -136,10 +137,15 @@ function Dashboard() {
                 Setor: ""
               })
                 .then(() => {
-                  console.log("Data updated successfully");
+                  notification.success({
+                    message: "Data Berhasil Di Simpan"
+                  })
                 })
                 .catch((error) => {
                   console.error("Data could not be updated", error);
+                  notification.error({
+                    message: "Data Tidak Berhasil Di Simpan"
+                  })
                 });
             }
           }
@@ -154,42 +160,54 @@ function Dashboard() {
   return (
     <div>
       <NavbarComponent />
-      
+
       <Container>
         <Alert message={`Selamat Datang ${username}`} type="info" />
         {(username === "ridwan" || username === "aris" || username === "dewi") && (
           <Row className='mt-3'>
-            <h4>Update Stock</h4>
-            <Col sm={4}>
-              <DatePicker placeholder='Tanggal Berapa' required format={"DD-MM-YYYY"} style={{ width: "100%" }} onChange={(date) => handlechange("TanggalBerapa", date && date.format('DD-MM-YYYY'))}></DatePicker>
+            <h4 className='d-flex justify-content-center'>Menu Update Stock</h4>
+            <Col className='d-flex justify-content-center' sm={4}>
+              {hide1 === true ?
+                <Button onClick={() => sethide1(false)} style={{ color: "white", backgroundColor: "#4A7EEE" }}>Tutup Menu Stock Open</Button>
+
+                : <Button onClick={() => sethide1(true)} style={{ color: "white", backgroundColor: "#4A7EEE" }}>Buka Menu Update Stock</Button>}
             </Col>
-            <Col className='mt-3' sm={4}>
-              <TimePicker required style={{ width: "100%" }} onChange={(momentObj) => handlechange("Jamberapa", momentObj && momentObj.format('HH:mm:ss'))} placeholder='Jam berapa' />
-            </Col>
-            <Col className='mt-3' sm={4}>
-              <Input required width={"100%"} type='number' onChange={(e) => handlechange("BerapaLiter", e.target.value)} placeholder='Berapa Liter stock'></Input>
-            </Col>
-            <Col className='mt-3 ' sm={4}>
-              <Button className='d-flex justify-content-center' style={{ color: "white", backgroundColor: "#4A7EEE" }} onClick={writeUserData}>Update Stock</Button>
-            </Col>
+            {(hide1 === true) && <>
+              <Col className='d-flex justify-content-center mt-3' sm={4}>
+              </Col>
+              <Col sm={4}>
+                <DatePicker placeholder='Tanggal Berapa' required format={"DD-MM-YYYY"} style={{ width: "100%" }} onChange={(date) => handlechange("TanggalBerapa", date && date.format('DD-MM-YYYY'))}></DatePicker>
+              </Col>
+              <Col className='mt-3' sm={4}>
+                <TimePicker required style={{ width: "100%" }} onChange={(momentObj) => handlechange("Jamberapa", momentObj && momentObj.format('HH:mm:ss'))} placeholder='Jam berapa' />
+              </Col>
+              <Col className='mt-3' sm={4}>
+                <Input required width={"100%"} type='number' onChange={(e) => handlechange("BerapaLiter", e.target.value)} placeholder='Berapa Liter stock'></Input>
+              </Col>
+              <Col className='mt-3 ' sm={4}>
+                <Button className='d-flex justify-content-center' style={{ color: "white", backgroundColor: "red" }} onClick={writeUserData}>Update Stock</Button>
+              </Col>
+            </>}
+
           </Row>
         )}
         <div className='mt-4'>
-        <Harga />
-      </div>
+          <Harga />
+        </div>
         <div className='mt-4'>
           <Informasi />
         </div>
-        
-        <div className='mt-4 d-flex justify-content-center'>
+
+        <div >
           <Row>
-            <Col>
+          <h4 className='mt-4 d-flex justify-content-center'>Menu Update Stock</h4>
+            <Col className='mt-1 d-flex justify-content-center'>
               {hide === true ? (
                 <div className='d-flex justify-content-center'>
-                  <Button onClick={() => sethide(false)} style={{ color: "white", backgroundColor: "#4A7EEE" }}>Sudah Ambil Bensin</Button>
+                  <Button onClick={() => sethide(false)} style={{ color: "white", backgroundColor: "#4A7EEE" }}>Tutup Menu Ambil Bensin</Button>
                 </div>
               ) : (
-                <Button onClick={() => sethide(true)} style={{ color: "white", backgroundColor: "#4A7EEE" }}>Ambil Bensin</Button>
+                <Button onClick={() => sethide(true)} style={{ color: "white", backgroundColor: "#4A7EEE" }}>Buka Menu Ambil Bensin</Button>
               )}
             </Col>
 

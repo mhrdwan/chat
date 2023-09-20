@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Table, Tag } from 'antd';
+import { Alert, Button, Table, Tag, message } from 'antd';
 import { getDatabase, ref, onValue, off, get, update } from 'firebase/database';
 import useUserStore from '../zustand/UserStore';
 
@@ -62,6 +62,11 @@ function Tables() {
             title: 'Berapa Liter',
             dataIndex: 'BerapaLiter',
             key: 'BerapaLiter',
+            render: (render) => {
+                return (
+                    <Tag color='blue'>{render}</Tag>
+                )
+            }
         },
         {
             title: 'Waktu',
@@ -73,13 +78,12 @@ function Tables() {
                 );
 
                 if (duplicate) {
-                    warna = "red";
+                    warna = "orange";
                 }
 
                 return (
                     <div>
-                        <Tag color={warna}>{record.TanggalBerapa}</Tag>
-                        <div>{record.Jamberapa}</div>
+                        <Tag color={warna}>{record.TanggalBerapa} <br /> {record.Jamberapa}</Tag>
                     </div>
                 );
             },
@@ -116,7 +120,6 @@ function Tables() {
                         style={{ color: "white", backgroundColor: "#4a7eee" }}
                         onClick={() => {
                             console.log('data:', record);
-
                         }}
                     >
                         Sudah Setor
@@ -145,13 +148,14 @@ function Tables() {
 
 
     return (
-        <div>
+        <div style={{ overflow: 'auto' }}>
             <Table
                 dataSource={Datasemua}
                 columns={columns}
                 pagination={{ pageSize: 5 }}
             />
         </div>
+
     );
 }
 
