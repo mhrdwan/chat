@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getDatabase, ref, onValue, off, push } from 'firebase/database';
 import "./Informasi.css"
-import { Tag } from 'antd';
+import { Alert, Tag } from 'antd';
 import useUserStore from '../zustand/UserStore';
 function App() {
     const [latestData, setLatestData] = useState([]);
@@ -16,7 +16,13 @@ function App() {
     useEffect(() => {
         const db = getDatabase();
         const SemuaStock = ref(db, 'Stock');
-
+        const connectedRef = ref(db, ".info/connected");
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+            } else {
+                alert("Tidak Ada Koneksi Internet");
+            }
+        });
         const listener = onValue(SemuaStock, (snapshot) => {
             if (snapshot.exists()) {
                 const allData = snapshot.val();
@@ -67,7 +73,7 @@ function App() {
                 <div className="informasi-container">
                     <div className="informasi-box">
                         <h5>Jumlah Liter Tersisa</h5>
-                        <div className='mt-auto'> 
+                        <div className='mt-auto'>
                             <Tag color='red'>{TerakhirAmbil.BerapaLiter === "0L" ? "Stock Habis" : TerakhirAmbil.BerapaLiter}</Tag>
                         </div>
                     </div>
