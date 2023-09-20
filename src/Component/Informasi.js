@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getDatabase, ref, onValue, off } from 'firebase/database';
+import { getDatabase, ref, onValue, off, push } from 'firebase/database';
 import "./Informasi.css"
 import { Tag } from 'antd';
+import useUserStore from '../zustand/UserStore';
 function App() {
     const [latestData, setLatestData] = useState([]);
     const [TerakhirAmbil, setTerakhirAmbil] = useState({
@@ -10,7 +11,8 @@ function App() {
         Jamberapa: null,
         TanggalBerapa: null,
     });
-
+    const NamaPengambilBensin = useUserStore((state) => state.NamaPengambilBensin);
+    const jamPengambilBensin = useUserStore((state) => state.jamPengambilBensin);
     useEffect(() => {
         const db = getDatabase();
         const SemuaStock = ref(db, 'Stock');
@@ -18,7 +20,7 @@ function App() {
         const listener = onValue(SemuaStock, (snapshot) => {
             if (snapshot.exists()) {
                 const allData = snapshot.val();
-                console.log(`allData`, allData);
+                // console.log(`allData`, allData);
 
                 let newLatestData = [];
 
@@ -27,15 +29,15 @@ function App() {
                         const keys = Object.keys(allData[userIdx]).sort();
                         const lastKey = keys[keys.length - 1];
 
-                        console.log(`Latest data for user index ${userIdx}:`);
+                        // console.log(`Latest data for user index ${userIdx}:`);
                         const latest = allData[userIdx][lastKey];
-                        console.log(latest);
+                        // console.log(latest);
 
                         newLatestData.push(latest);
                     }
                 }
 
-                setLatestData(newLatestData);  // Update state dengan data terbaru
+                setLatestData(newLatestData);
             }
         }, (error) => {
             console.error(error);
@@ -45,7 +47,6 @@ function App() {
     }, []);
 
     useEffect(() => {
-        // Logic untuk mengambil data terakhir dari array `latestData`
         if (latestData.length > 0) {
             const lastEntry = latestData[latestData.length - 1];
             setTerakhirAmbil({
@@ -57,24 +58,27 @@ function App() {
         }
     }, [latestData]);
 
+    console.log(`TerakhirAmbil`, TerakhirAmbil);
+    
+
     return (
         <div>
-            {/* Tampilkan data terakhir */}
             {TerakhirAmbil.nama && (
                 <div className="informasi-container">
                     <div className="informasi-box">
                         <h5>Jumlah Liter Tersisa</h5>
-                        <Tag color='red'>{TerakhirAmbil.BerapaLiter}</Tag>
+                        <Tag color='red'>{TerakhirAmbil.BerapaLiter === "0L" ? "Stock Habis" : TerakhirAmbil.BerapaLiter}</Tag>
 
                     </div>
                     <div className="informasi-box">
-                        <h5>Terakhir Di isi di Rumah</h5>
+                        <h5>Terakhir Di isi Stock</h5>
                         <Tag color='green'>{TerakhirAmbil.nama}</Tag>
-                        <div>{TerakhirAmbil.TanggalBerapa}</div>
-                        <div>{TerakhirAmbil.Jamberapa}</div>
+                        <Tag className='mt-2' color='orange'>{TerakhirAmbil.TanggalBerapa} <br /> {TerakhirAmbil.Jamberapa}</Tag>
                     </div>
                     <div className="informasi-box">
                         <h5>Terakhir Diambil Oleh</h5>
+                        <Tag color='blue'>{NamaPengambilBensin}</Tag>
+                        <Tag className='mt-2' color='red'>{jamPengambilBensin}</Tag>
                     </div>
                 </div>
             )}
